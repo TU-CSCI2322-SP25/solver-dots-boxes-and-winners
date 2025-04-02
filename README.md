@@ -1,10 +1,9 @@
 # solver-dots-boxes-and-winners
-solver-dots-boxes-and-winners created by GitHub Classroom
 
-Gabriel Garza
+*Gabriel Garza
 
-Mera Paqut-Durand Ford
+*Mera Paquet-Durand Ford
 
-Viviana Ramirez
+*Viviana Ramirez
 
-Canon
+*Canon
