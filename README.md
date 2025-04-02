@@ -3,7 +3,7 @@ solver-dots-boxes-and-winners created by GitHub Classroom
 
 Gabriel Garza
 
-Mera Paqut-Durand Ford
+Mera Paquet-Durand Ford
 
 Vivanna
 
