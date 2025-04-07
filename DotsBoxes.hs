@@ -1,3 +1,4 @@
+module DotsBoxes
 type Point = (Int, Int)
 type Player = Char
 type Order = [Player]
