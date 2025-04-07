@@ -3,4 +3,4 @@ import DotsBoxes
 
 main::IO()
 main = do
-return ()
+  runTests 1 True
