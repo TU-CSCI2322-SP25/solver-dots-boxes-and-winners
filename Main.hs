@@ -1,6 +1,7 @@
 module Main where
 import DotsBoxes
+import Testing
 
 main::IO()
 main = do
-return ()
+  runTests 1 True
