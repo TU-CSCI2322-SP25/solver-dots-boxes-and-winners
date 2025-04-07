@@ -7,9 +7,12 @@ import Test.Grader.Rubric
 import Control.Monad.Extra
 import Control.Monad.Trans.RWS
 
+tempTest = assess "temp" 0 $ do
+        check "temp" $ 1 == 1 `shouldBe` True
 
 tree = describe "Project 5" $ do
         describe "Sprint One" $ do
+                tempTest
 
 runTests :: Int -> Bool -> IO ()
 runTests verb force = do
