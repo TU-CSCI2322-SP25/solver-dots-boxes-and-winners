@@ -15,3 +15,18 @@ showCycle (x:xs) = show (x:(takeWhile (/=x) xs))
   --show (Bd gr pt ord) = unword ["Board", show gr, show pt, showCycle ord]
 
 data Winner = Player | None | Tie String
+
+
+prettyPrintPlayers :: Board -> [Char] -> String
+prettyPrintPlayers b [] = []
+prettyPrintPlayers b (x:xs) = 
+        let wins = length [ v | (u, v) <- (boxes b), v == x]
+        in "Player " ++ [x] ++ " has " ++ show wins ++ " boxes \n" ++ (prettyPrintPlayers b xs)
+
+prettyPrintBoard :: Board -> String
+prettyPrintBoard b = 
+        let num = fst (size b) * snd (size b)
+            progress = length (boxes b)
+        in "The board is size: \n" ++ show num ++
+           show progress ++ "boxes have been made in total \n" ++
+           (prettyPrintPlayers b (order b))
