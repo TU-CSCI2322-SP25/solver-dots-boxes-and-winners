@@ -27,6 +27,8 @@ prettyPrintBoard :: Board -> String
 prettyPrintBoard b = 
         let num = fst (size b) * snd (size b)
             progress = length (boxes b)
-        in "The board is size: \n" ++ show num ++
-           show progress ++ "boxes have been made in total \n" ++
+            actions = length (grid b)
+        in "The board is size: " ++ show num ++ "\n" ++
+           show actions ++ " lines have been made \n" ++
+           show progress ++ " boxes have been made in total \n" ++
            (prettyPrintPlayers b (order b))
