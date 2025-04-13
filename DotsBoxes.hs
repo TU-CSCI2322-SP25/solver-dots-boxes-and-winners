@@ -16,7 +16,6 @@ showCycle (x:xs) = show (x:(takeWhile (/=x) xs))
 
 data Winner = Player | None | Tie String
 
-
 prettyPrintPlayers :: Board -> [Char] -> String
 prettyPrintPlayers b [] = []
 prettyPrintPlayers b (x:xs) = 
