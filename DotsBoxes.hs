@@ -15,3 +15,8 @@ showCycle (x:xs) = show (x:(takeWhile (/=x) xs))
   --show (Bd gr pt ord) = unword ["Board", show gr, show pt, showCycle ord]
 
 data Winner = Player | None | Tie String
+
+
+legalMoves :: Board -> [Move]
+legalMoves bd = [x| x <- allMoves, not (x `elem` (grid bd))]
+  where allMoves = [((x, y), d)| x <- [0.. (fst (size bd))], y <- [0.. (snd (size bd))], d <- [Vertical, Horizontal]]
