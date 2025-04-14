@@ -19,4 +19,4 @@ data Winner = Player | None | Tie String
 
 legalMoves :: Board -> [Move]
 legalMoves bd = [x| x <- allMoves, not (x `elem` (grid bd))]
-  where allMoves = [((x, y), d)| x <- [0.. (fst (size bd))], y <- [0.. (snd (size bd))], d <- [Vertical, Horizontal]]
+  where allMoves = [((x, y), d)| x <- [0.. (fst (size bd))], y <- [0.. (snd (size bd))], d <- [Vertical, Horizontal], not (d == Vertical && y == (snd (size bd))), not (d == Horizontal && x == (fst (size bd)))]
