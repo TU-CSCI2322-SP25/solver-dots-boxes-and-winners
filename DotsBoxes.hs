@@ -13,8 +13,8 @@ data Winner = Win Player | Tie String deriving (Show)
 
 
 showCycle (x:xs) = show (x:(takeWhile (/=x) xs))
---instance Show Board where
-  --show (Bd gr pt ord) = unword ["Board", show gr, show pt, showCycle ord]
+instance Show Board where
+  show (Board sz gr pt ord) = unwords ["Board", show sz, show gr, show pt, showCycle ord]
 
 legalMoves :: Board -> [Move]
 legalMoves bd = [x| x <- allMoves, not (x `elem` (grid bd))]
@@ -45,7 +45,7 @@ winnerFromPoints pts = if length trimmed == 1 then Win (head trimmed) else (Tie 
         trimmed = [x| (x,y) <- pts, y == mst]
 
 findWinner :: Board -> Maybe Winner
-findWinner bd = if length (boxes bd) < ((fst (size bd))) * ((snd (size bd))) then Nothing else Just winnerFromPoints (dividePoints (show (order bd)) (boxes bd))
+findWinner bd = if length (boxes bd) < ((fst (size bd))) * ((snd (size bd))) then Nothing else Just (winnerFromPoints (dividePoints (show (order bd)) (boxes bd)))
 
 prettyPrintPlayers :: Board -> [Char] -> String
 prettyPrintPlayers b [] = []
