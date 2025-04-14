@@ -21,7 +21,7 @@ addBox ((x, y), d) b p = (boxes b) ++ vertL ++ vertR ++ horzT ++ horzB
         where vertL = if d == Vertical && ((x+1, y), Vertical) `elem` (grid b) && ((x, y), Horizontal) `elem` (grid b) && ((x,y+1), Horizontal) `elem` (grid b) then [((x, y), p)] else []
               vertR = if d == Vertical && ((x-1, y), Vertical) `elem` (grid b) && ((x-1, y), Horizontal) `elem` (grid b) && ((x-1,y+1), Horizontal) `elem` (grid b) then [((x-1, y), p)] else []
               horzT = if d == Horizontal && ((x, y+1), Horizontal) `elem` (grid b) && ((x, y), Vertical) `elem` (grid b) && ((x+1,y), Vertical) `elem` (grid b) then [((x, y), p)] else []
-              horzB = if d == Horizontal && ((x, y-1), Horizontal) `elem` (grid b) && ((x, y-1), Vertical) `elem` (grid b) && ((x+1,y-1), Vertical) `elem` (grid b) then [((x, y), p)] else []
+              horzB = if d == Horizontal && ((x, y-1), Horizontal) `elem` (grid b) && ((x, y-1), Vertical) `elem` (grid b) && ((x+1,y-1), Vertical) `elem` (grid b) then [((x, y-1), p)] else []
 
 makeMove :: Board -> Move -> Board
 makeMove b m =
