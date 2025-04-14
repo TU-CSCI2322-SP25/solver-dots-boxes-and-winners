@@ -9,7 +9,7 @@ type Line = (Point, Dir)
 type Move = Line
 type Grid = [Line]
 data Board = Board { size :: (Int, Int), grid :: Grid, boxes :: [Box], order :: Order}
-data Winner = Win Player | None | Tie String deriving (Show)
+data Winner = Win Player | Tie String deriving (Show)
 
 
 showCycle (x:xs) = show (x:(takeWhile (/=x) xs))
@@ -44,8 +44,8 @@ winnerFromPoints pts = if length trimmed == 1 then Win (head trimmed) else (Tie 
   where mst = maximum [y| (x,y) <- pts]
         trimmed = [x| (x,y) <- pts, y == mst]
 
-findWinner :: Board -> Winner
-findWinner bd = if length (boxes bd) < ((fst (size bd))) * ((snd (size bd))) then None else winnerFromPoints (dividePoints (show (order bd)) (boxes bd))
+findWinner :: Board -> Maybe Winner
+findWinner bd = if length (boxes bd) < ((fst (size bd))) * ((snd (size bd))) then Nothing else Just winnerFromPoints (dividePoints (show (order bd)) (boxes bd))
 
 prettyPrintPlayers :: Board -> [Char] -> String
 prettyPrintPlayers b [] = []
