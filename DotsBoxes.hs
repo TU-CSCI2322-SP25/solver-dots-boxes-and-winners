@@ -9,6 +9,8 @@ type Line = (Point, Dir)
 type Move = Line
 type Grid = [Line]
 data Board = Board { size :: (Int, Int), grid :: Grid, boxes :: [Box], order :: Order}
+data Winner = Win Player | None | Tie String deriving (Show)
+
 
 showCycle (x:xs) = show (x:(takeWhile (/=x) xs))
 --instance Show Board where
@@ -25,14 +27,13 @@ addBox ((x, y), d) b p = (boxes b) ++ vertL ++ vertR ++ horzT ++ horzB
               horzT = if d == Horizontal && ((x, y+1), Horizontal) `elem` (grid b) && ((x, y), Vertical) `elem` (grid b) && ((x+1,y), Vertical) `elem` (grid b) then [((x, y), p)] else []
               horzB = if d == Horizontal && ((x, y-1), Horizontal) `elem` (grid b) && ((x, y-1), Vertical) `elem` (grid b) && ((x+1,y-1), Vertical) `elem` (grid b) then [((x, y-1), p)] else []
 
-makeMove :: Board -> Move -> Board
-makeMove b m =
+makeMove :: Board -> Move -> Maybe Board
+makeMove b m = if fst (fst m) > fst (size b) || snd (fst m) > snd (size b) || m `elem` (grid b) then Nothing else 
         let nGrid = (grid b) ++ [m]
             nBoxes = addBox m b (head (order b))
-        in Board { size = (size b), grid = nGrid, boxes = nBoxes, order = (order b)} 
+            nOrder = tail (order b)
+        in Just Board { size = (size b), grid = nGrid, boxes = nBoxes, order = if (length nBoxes) == (length (boxes b)) then nOrder else order b} 
             
-data Winner = Win Player | None | Tie String deriving (Show)
-
 
 dividePoints :: [Player] -> [Box] -> [(Player, Int)]
 dividePoints [] bxs = []
@@ -50,7 +51,7 @@ prettyPrintPlayers :: Board -> [Char] -> String
 prettyPrintPlayers b [] = []
 prettyPrintPlayers b (x:xs) = 
         let wins = length [ v | (u, v) <- (boxes b), v == x]
-        in "Player " ++ [x] ++ " has " ++ show wins ++ " boxes \n" ++ (prettyPrintPlayers b xs)
+        in "Player " ++ [x] ++ " has " ++ show wins ++ " boxes \n" ++ (prettyPrintPlayers b (tail (show (x:xs))))
 
 prettyPrintBoard :: Board -> String
 prettyPrintBoard b = 
