@@ -40,12 +40,17 @@ dividePoints [] bxs = []
 dividePoints (pl:pls) bxs = (pl, length (filter (\(x, y) -> y==pl) bxs)):(dividePoints pls bxs)
 
 winnerFromPoints :: [(Player, Int)] -> Winner
-winnerFromPoints pts = if length trimmed == 1 then Win (head trimmed) else (Tie trimmed)
+winnerFromPoints pts = 
+  case trimmed of 
+    [x] -> Win x 
+    _ -> Tie trimmed
   where mst = maximum [y| (x,y) <- pts]
         trimmed = [x| (x,y) <- pts, y == mst]
 
 findWinner :: Board -> Maybe Winner
-findWinner bd = if length (boxes bd) < ((fst (size bd))) * ((snd (size bd))) then Nothing else Just (winnerFromPoints (dividePoints (show (order bd)) (boxes bd)))
+findWinner bd@(Board (xl, yl) _ bxs ord) = if length bxs < xl * yl 
+                then Nothing 
+                else Just $ winnerFromPoints (dividePoints (showCycle ord) bxs)
 
 prettyPrintPlayers :: Board -> [Char] -> String
 prettyPrintPlayers b [] = []
