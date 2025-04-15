@@ -31,8 +31,8 @@ makeMove :: Board -> Move -> Maybe Board
 makeMove b m = if fst (fst m) > fst (size b) || snd (fst m) > snd (size b) || m `elem` (grid b) then Nothing else 
         let nGrid = (grid b) ++ [m]
             nBoxes = addBox m b (head (order b))
-            nOrder = tail (order b)
-        in Just Board { size = (size b), grid = nGrid, boxes = nBoxes, order = if (length nBoxes) == (length (boxes b)) then nOrder else order b} 
+            nOrder = if (length nBoxes) == (length (boxes b)) then tail (order b) else order b
+        in Just $ b { grid = nGrid, boxes = nBoxes, order = nOrder} 
             
 
 dividePoints :: [Player] -> [Box] -> [(Player, Int)]
