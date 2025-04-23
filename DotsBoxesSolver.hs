@@ -22,3 +22,14 @@ bestMove bd =
             wonGames = [m| (m,w) <- options, w == Win (head (order bd))]
             tiedGames = [m| (m,w) <- options, isTieWith (head (order bd)) w]
         in if wonGames /= [] then head wonGames else if tiedGames /= [] then head tiedGames else fst (head options)
+
+
+rateGame :: Board -> Int 
+rateGame bd
+        |won == Just (Win (head (order bd))) = maxScore
+        |won == Just (Win (head (tail (order bd)))) = -(maxScore)
+        |otherwise = 
+            let divided = dividePoints (showCycle (order bd)) (boxes bd)
+            in snd (head divided) - snd (head (tail divided))
+        where won = findWinner bd
+              maxScore = fst (size bd) * snd (size bd)
