@@ -52,19 +52,9 @@ findWinner bd@(Board (xl, yl) _ bxs ord) = if length bxs < xl * yl
                 then Nothing 
                 else Just $ winnerFromPoints (dividePoints (showCycle ord) bxs)
 
-prettyPrintPlayers :: Board -> [Char] -> String
-prettyPrintPlayers b [] = []
-prettyPrintPlayers b (x:xs) = 
-        let wins = length [ v | (u, v) <- (boxes b), v == x]
-        in "Player " ++ [x] ++ " has " ++ show wins ++ " boxes \n" ++ (prettyPrintPlayers b (tail (show (x:xs))))
-
-prettyPrintBoard :: Board -> String
-prettyPrintBoard b = 
-        let num = fst (size b) * snd (size b)
-            progress = length (boxes b)
-            actions = length (grid b)
-        in "The board is size: " ++ show num ++ "\n" ++
-           show actions ++ " lines have been made \n" ++
-           show progress ++ " boxes have been made in total \n" ++
-           (prettyPrintPlayers b (order b))
+prettyPrint board = unlines [ showIndex ind | ind <- [0..yl ]
+   where (xl, yl) = size board
+         showIndex ind = showHorizontal ind ++ "\n" ++ showVertical ind ++ "\n"
+         showHorizontal ind = undefined -- print all the "._." or ". ." for the horizontal lines
+         showVertical ind = undefined -- print all the "|   |" or spaces for the vertical lines, unless the last index.
 
