@@ -67,4 +67,16 @@ prettyPrintBoard b =
            show actions ++ " lines have been made \n" ++
            show progress ++ " boxes have been made in total \n" ++
            (prettyPrintPlayers b (order b))
+showGame :: Board -> String
+showGame (Board sz gr bxs ord) =
+    let sizeStr = "Size: " ++ show (fst sz) ++ "x" ++ show (snd sz)
+        playersStr = "Players: " ++ ord
+        gridStr = "Grid:\n" ++ unlines (map showLine gr)
+        boxesStr = "Boxes:\n" ++ unlines (map showBox bxs)
+    in unlines [sizeStr, playersStr, gridStr, boxesStr]
 
+showLine :: Line -> String
+showLine ((x, y), d) = "(" ++ show x ++ "," ++ show y ++ ") " ++ show d
+
+showBox :: Box -> String
+showBox ((x, y), p) = "(" ++ show x ++ "," ++ show y ++ ") " ++ [p]
