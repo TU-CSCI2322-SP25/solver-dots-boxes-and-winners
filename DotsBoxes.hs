@@ -54,7 +54,21 @@ findWinner bd@(Board (xl, yl) _ bxs ord) = if length bxs < xl * yl
 
 prettyPrint board = unlines [ showIndex ind | ind <- [0..yl ]
    where (xl, yl) = size board
-         showIndex ind = showHorizontal ind ++ "\n" ++ showVertical ind ++ "\n"
-         showHorizontal ind = undefined -- print all the "._." or ". ." for the horizontal lines
-         showVertical ind = undefined -- print all the "|   |" or spaces for the vertical lines, unless the last index.
+         showIndex ind = showHorizontal 0 ind ++ "\n" ++ showVertical 0 ind
+         showHorizontal s ind = 
+                  if s < xl
+                  then
+                        if ((s, ind), Horizontal) `elem` (grid board)
+                        then "._" ++ showHorizontal (s+1) ind
+                        else ". " ++ showHorizontal (s+1) ind
+                  else []
+         -- print all the "._." or ". ." for the horizontal lines
+         showVertical s ind = 
+                  if ind < yl
+                  then
+                        if ((s, ind), Vertical) `elem` (grid board)
+                        then "| " ++ showVertical (s+1) ind
+                        else "  " ++ showVertical (s+1) ind
+                  else []
+          -- print all the "|   |" or spaces for the vertical lines, unless the last index.
 
