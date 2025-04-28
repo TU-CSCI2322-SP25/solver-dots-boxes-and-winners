@@ -34,8 +34,8 @@ makeMove :: Board -> Move -> Maybe Board
 makeMove b m = if fst (fst m) > fst (size b) || snd (fst m) > snd (size b) || m `elem` (grid b) then Nothing else 
         let nGrid = (grid b) ++ [m]
             nBoxes = addBox m b (head (order b))
-            nOrder = tail (order b)
-        in Just Board { size = (size b), grid = nGrid, boxes = nBoxes, order = if (length nBoxes) == (length (boxes b)) then nOrder else order b} 
+            nOrder = if (length nBoxes) == (length (boxes b)) then tail (order b) else order b
+        in Just $ b { grid = nGrid, boxes = nBoxes, order = nOrder} 
             
 
 dividePoints :: [Player] -> [Box] -> [(Player, Int)]
@@ -43,12 +43,17 @@ dividePoints [] bxs = []
 dividePoints (pl:pls) bxs = (pl, length (filter (\(x, y) -> y==pl) bxs)):(dividePoints pls bxs)
 
 winnerFromPoints :: [(Player, Int)] -> Winner
-winnerFromPoints pts = if length trimmed == 1 then Win (head trimmed) else (Tie trimmed)
+winnerFromPoints pts = 
+  case trimmed of 
+    [x] -> Win x 
+    _ -> Tie trimmed
   where mst = maximum [y| (x,y) <- pts]
         trimmed = [x| (x,y) <- pts, y == mst]
 
 findWinner :: Board -> Maybe Winner
-findWinner bd = if length (boxes bd) < ((fst (size bd))) * ((snd (size bd))) then Nothing else Just (winnerFromPoints (dividePoints (show (order bd)) (boxes bd)))
+findWinner bd@(Board (xl, yl) _ bxs ord) = if length bxs < xl * yl 
+                then Nothing 
+                else Just $ winnerFromPoints (dividePoints (showCycle ord) bxs)
 
 prettyPrintPlayers :: Board -> [Char] -> String
 prettyPrintPlayers b [] = []
@@ -65,6 +70,13 @@ prettyPrintBoard b =
            show actions ++ " lines have been made \n" ++
            show progress ++ " boxes have been made in total \n" ++
            (prettyPrintPlayers b (order b))
+showGame :: Board -> String
+showGame (Board sz gr bxs ord) =
+    let sizeStr = "Size: " ++ show (fst sz) ++ "x" ++ show (snd sz)
+        playersStr = "Players: " ++ ord
+        gridStr = "Grid:\n" ++ unlines (map showLine gr)
+        boxesStr = "Boxes:\n" ++ unlines (map showBox bxs)
+    in unlines [sizeStr, playersStr, gridStr, boxesStr]
 
 readGame :: String -> Board
 readGame input = 
@@ -91,3 +103,10 @@ parseBoxes (s:ss) =
         [x,y] = map read (take 2 parts)
         player = last parts
     in ((x,y), head player) : parseBoxes ss
+
+showLine :: Line -> String
+showLine ((x, y), d) = "(" ++ show x ++ "," ++ show y ++ ") " ++ show d
+
+showBox :: Box -> String
+showBox ((x, y), p) = "(" ++ show x ++ "," ++ show y ++ ") " ++ [p]
+
