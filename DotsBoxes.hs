@@ -1,4 +1,6 @@
 module DotsBoxes where
+import Data.List.Split (splitOn)  
+
 
 type Point = (Int, Int)
 type Player = Char
@@ -10,6 +12,7 @@ type Move = Line
 type Grid = [Line]
 data Board = Board { size :: (Int, Int), grid :: Grid, boxes :: [Box], order :: Order}
 data Winner = Win Player | Tie String deriving (Show)
+
 
 
 showCycle (x:xs) = show (x:(takeWhile (/=x) xs))
@@ -75,8 +78,35 @@ showGame (Board sz gr bxs ord) =
         boxesStr = "Boxes:\n" ++ unlines (map showBox bxs)
     in unlines [sizeStr, playersStr, gridStr, boxesStr]
 
+readGame :: String -> Board
+readGame input = 
+    let ls = lines input
+        [width, height] = map read $ splitOn "," (head ls)
+        players = ls !! 1          
+        moves = concatMap parseMove (words (ls !! 2))
+        boxes = parseBoxes (words (ls !! 3))
+    in Board (width, height) moves boxes (cycle players)
+
+parseMove :: String -> [Line]
+parseMove s = 
+    let parts = splitOn "," (filter (/=' ') s)
+        [x,y] = map read (take 2 parts)
+        dir = case last parts of
+                "H" -> Horizontal
+                "V" -> Vertical
+    in [((x,y), dir)]
+
+parseBoxes :: [String] -> [Box]
+parseBoxes [] = []
+parseBoxes (s:ss) = 
+    let parts = splitOn "," (filter (/=' ') s)
+        [x,y] = map read (take 2 parts)
+        player = last parts
+    in ((x,y), head player) : parseBoxes ss
+
 showLine :: Line -> String
 showLine ((x, y), d) = "(" ++ show x ++ "," ++ show y ++ ") " ++ show d
 
 showBox :: Box -> String
 showBox ((x, y), p) = "(" ++ show x ++ "," ++ show y ++ ") " ++ [p]
+
