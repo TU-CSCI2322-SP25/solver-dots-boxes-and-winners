@@ -96,7 +96,7 @@ showLine ((x, y), d) = "(" ++ show x ++ "," ++ show y ++ ") " ++ show d
 showBox :: Box -> String
 showBox ((x, y), p) = "(" ++ show x ++ "," ++ show y ++ ") " ++ [p]
 
-prettyPrint board = unlines [ showIndex ind | ind <- [0..yl ]
+prettyPrint board = unlines [ showIndex ind | ind <- [0..yl ]]
    where (xl, yl) = size board
          showIndex ind = showHorizontal 0 ind ++ "\n" ++ showVertical 0 ind
          showHorizontal s ind = 
@@ -108,7 +108,7 @@ prettyPrint board = unlines [ showIndex ind | ind <- [0..yl ]
                   else []
          -- print all the "._." or ". ." for the horizontal lines
          showVertical s ind = 
-                  if ind < yl
+                  if s < xl
                   then
                         if ((s, ind), Vertical) `elem` (grid board)
                         then "| " ++ showVertical (s+1) ind
