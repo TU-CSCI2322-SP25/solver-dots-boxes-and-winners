@@ -93,7 +93,9 @@ parseMove s =
         [x,y] = map read (take 2 parts)
         dir = case last parts of
                 "H" -> Horizontal
+                "h" -> Horizontal
                 "V" -> Vertical
+                "v" -> Vertical
     in [((x,y), dir)]
 
 parseBoxes :: [String] -> [Box]
