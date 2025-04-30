@@ -55,21 +55,7 @@ findWinner bd@(Board (xl, yl) _ bxs ord) = if length bxs < xl * yl
                 then Nothing 
                 else Just $ winnerFromPoints (dividePoints (showCycle ord) bxs)
 
-prettyPrintPlayers :: Board -> [Char] -> String
-prettyPrintPlayers b [] = []
-prettyPrintPlayers b (x:xs) = 
-        let wins = length [ v | (u, v) <- (boxes b), v == x]
-        in "Player " ++ [x] ++ " has " ++ show wins ++ " boxes \n" ++ (prettyPrintPlayers b (tail (show (x:xs))))
 
-prettyPrintBoard :: Board -> String
-prettyPrintBoard b = 
-        let num = fst (size b) * snd (size b)
-            progress = length (boxes b)
-            actions = length (grid b)
-        in "The board is size: " ++ show num ++ "\n" ++
-           show actions ++ " lines have been made \n" ++
-           show progress ++ " boxes have been made in total \n" ++
-           (prettyPrintPlayers b (order b))
 showGame :: Board -> String
 showGame (Board sz gr bxs ord) =
     let sizeStr = "Size: " ++ show (fst sz) ++ "x" ++ show (snd sz)
@@ -109,4 +95,24 @@ showLine ((x, y), d) = "(" ++ show x ++ "," ++ show y ++ ") " ++ show d
 
 showBox :: Box -> String
 showBox ((x, y), p) = "(" ++ show x ++ "," ++ show y ++ ") " ++ [p]
+
+prettyPrint board = unlines [ showIndex ind | ind <- [0..yl ]
+   where (xl, yl) = size board
+         showIndex ind = showHorizontal 0 ind ++ "\n" ++ showVertical 0 ind
+         showHorizontal s ind = 
+                  if s < xl
+                  then
+                        if ((s, ind), Horizontal) `elem` (grid board)
+                        then "._" ++ showHorizontal (s+1) ind
+                        else ". " ++ showHorizontal (s+1) ind
+                  else []
+         -- print all the "._." or ". ." for the horizontal lines
+         showVertical s ind = 
+                  if ind < yl
+                  then
+                        if ((s, ind), Vertical) `elem` (grid board)
+                        then "| " ++ showVertical (s+1) ind
+                        else "  " ++ showVertical (s+1) ind
+                  else []
+          -- print all the "|   |" or spaces for the vertical lines, unless the last index.
 
