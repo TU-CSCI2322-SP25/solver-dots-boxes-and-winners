@@ -1,7 +1,11 @@
 module Main where
 import DotsBoxes
+import ReadGame
+import System.IO
 import Testing
 
-main::IO()
+main :: IO ()
 main = do
-  runTests 1 True
+  content <- readFile "game3.txt"
+  let board = readGame content
+  print board
