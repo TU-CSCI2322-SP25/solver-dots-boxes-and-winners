@@ -1,11 +1,90 @@
 module Main where
-import DotsBoxes
-import ReadGame
+import Data.Maybe
+import Text.Read
 import System.IO
-import Testing
+import System.Environment
+import Control.Monad
+import System.Console.GetOpt
 
-main :: IO ()
+data Flag = Winner | Depth String | MoveFlag String | Verbose | Interactive | Help deriving (Show, Eq)
+
+options :: [OptDescr Flag]
+options = [ Option ['w'] ["winner"]        (NoArg Winner)           "Print the best move."
+          , Option ['d'] ["depth"]         (ReqArg Depth "<num>")   "Specifies a cutoff depth, defaults to 4."
+          , Option ['m'] ["move"]          (ReqArg MoveFlag "<move>") "Print the result of the move."
+          , Option ['v'] ["verbose"]       (NoArg Verbose)          "Print both the move and result of the move."
+          , Option ['i'] ["interactive"]   (NoArg Interactive)      "Play a game against the computer."
+          , Option ['h'] ["help"]          (NoArg Help)             "Print usage information and exit."
+          ]
+
+executableName = "executableNameGoesHere"
+defaultDepth = 3 --change these for your particular game.
+--delete these four lines after you import your module!
+type Game = Int
+type Move = Int
+readGame = undefined
+makeMove = undefined
+-- to here
+
+moveIO :: [Flag] -> Game -> IO()
+moveIO flags game = 
+  case getMove flags of
+    Just movefl -> 
+        case makeMove game movefl of
+          Just g -> if Verbose `elem` flags 
+                    then putStrLn "Feature not implemented" -- Put your prettyPrint here
+                    else putStrLn "Feature not implemented" -- put your showGame (in the file format) here 
+          Nothing -> putStrLn "Error: illegal move"
+    Nothing -> putStrLn "Error: invalid move format"
+
+showGoodMove :: Bool  -> Int -> Game -> IO ()
+showGoodMove False depth game = putStrLn "Feature not implemented" -- print the good move for the game
+showGoodMove True depth game = putStrLn "Feature not implemented" -- print both a good move for the game, and who will win.
+
+showBestMove :: Bool  -> Game -> IO ()
+showBestMove False game = putStrLn "Feature not implemented" -- print the best move for the game
+showBestMove True game = putStrLn "Feature not implemented" -- print both the best move for the game, and who will win.
+
+interactiveIO :: Int -> Game -> IO ()
+interactiveIO depth game = putStrLn "Feature not implemented" -- entirely optional interactive mode
+
+readMove :: String -> Maybe Move
+readMove = undefined -- convert a string into a move
+     
+getMove :: [Flag] -> Maybe Move
+getMove [] = Nothing
+getMove (MoveFlag m:_) = readMove m 
+getMove (_:flags) = getMove flags 
+
+isMove :: Flag -> Bool
+isMove (MoveFlag _) = True
+isMove _ = False
+
+getDepth :: [Flag] -> Maybe Int
+getDepth [] = Just defaultDepth
+getDepth (Depth d:_) = readMaybe d
+getDepth (_:flags) = getDepth flags
+
+main :: IO()
 main = do
-  content <- readFile "game3.txt"
-  let board = readGame content
-  print board
+  args <- getArgs
+  let (flags, inputs, errors) = getOpt Permute options args
+  if (Help `elem` flags) || (not $ null errors)
+  then putStrLn $ usageInfo (executableName ++ "[options] [filename]") options
+  else 
+    do let fName = if (null args)||(null inputs) 
+                   then "initial.txt" 
+                   else head inputs
+       contents <- readFile fName
+       case (readGame contents, getDepth flags) of
+        (Nothing, _) -> putStrLn "Invalid game file."
+        (game, Nothing) -> putStrLn "Invalid depth flag."
+        (Just game,Just depth) -> dispatch flags game depth
+
+dispatch :: [Flag] -> Game -> Int -> IO()
+dispatch flags game depth 
+  | any isMove flags = moveIO flags game
+  | Winner `elem` flags = showBestMove (Verbose `elem` flags) game
+  | Interactive `elem` flags = interactiveIO depth game
+  | otherwise = showGoodMove (Verbose `elem` flags) depth game
+
