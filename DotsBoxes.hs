@@ -11,7 +11,7 @@ type Line = (Point, Dir)
 type Move = Line
 type Grid = [Line]
 data Board = Board { size :: (Int, Int), grid :: Grid, boxes :: [Box], order :: Order}
-data Winner = Win Player | Tie String deriving (Show)
+data Winner = Win Player | Tie String deriving (Show, Eq)
 
 
 
