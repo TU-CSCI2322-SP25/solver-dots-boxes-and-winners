@@ -25,6 +25,7 @@ bestMove bd =
 
 
 rateGame :: Board -> Int 
+
 rateGame bd
         |won == Just (Win (head (order bd))) = maxScore
         |won == Just (Win (head (tail (order bd)))) = -(maxScore)
@@ -33,3 +34,21 @@ rateGame bd
             in snd (head divided) - snd (head (tail divided))
         where won = findWinner bd
               maxScore = fst (size bd) * snd (size bd)
+
+specialMax :: (Int, Move) -> (Int, Move) -> (Int, Move)
+specialMax (valA, mA) (valB, mB) = if valA > valB then (valA, mA) else (valB, mB)
+
+specialMaximum :: [(Int, Move)] -> Int -> (Int, Move)
+specialMaximum [] ma = (-ma, ((-1,-1),Horizontal))
+specialMaximum (x:xs) ma = if fst x == ma then x else specialMax x (specialMaximum xs ma)
+
+whoMightWin :: Int -> Board -> (Int, Move)
+
+whoMightWin depth board
+    |depth <= 0 = (rating,((-1,-1),Horizontal))
+    |rating == maxi = (rating,((-1,-1),Horizontal))
+    |rating == (-1 * maxi) = (rating,((-1,-1),Horizontal))
+    |otherwise = specialMaximum [((-1) * (fst (whoMightWin (depth -1) (fromJust (makeMove board m)))), m)| m <- (legalMoves board)] maxi
+        where rating = rateGame board
+              maxi = fst (size board) * snd (size board)
+
