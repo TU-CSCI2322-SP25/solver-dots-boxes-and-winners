@@ -6,6 +6,7 @@ import System.Environment
 import Control.Monad
 import System.Console.GetOpt
 import DotsBoxes
+import DotsBoxesSolver
 
 data Flag = Winner | Depth String | MoveFlag String | Verbose | Interactive | Help deriving (Show, Eq)
 
@@ -18,7 +19,7 @@ options = [ Option ['w'] ["winner"]        (NoArg Winner)           "Print the b
           , Option ['h'] ["help"]          (NoArg Help)             "Print usage information and exit."
           ]
 
-executableName = "executableNameGoesHere"
+executableName = "gameplay"
 defaultDepth = 3 --change these for your particular game.
 --delete these four lines after you import your module!
 -- to here
@@ -39,8 +40,8 @@ showGoodMove False depth game = putStrLn "Feature not implemented" -- print the 
 showGoodMove True depth game = putStrLn "Feature not implemented" -- print both a good move for the game, and who will win.
 
 showBestMove :: Bool  -> Board -> IO ()
-showBestMove False game = putStrLn "Feature not implemented" -- print the best move for the game
-showBestMove True game = putStrLn "Feature not implemented" -- print both the best move for the game, and who will win.
+showBestMove False game = putStrLn (showLine (bestMove game)) -- print the best move for the game
+showBestMove True game = putStrLn $ (showLine (bestMove game)) ++ " " ++ (show (whoWillWin game)) -- print both the best move for the game, and who will win.
 
 interactiveIO :: Int -> Board -> IO ()
 interactiveIO depth game = putStrLn "Feature not implemented" -- entirely optional interactive mode
@@ -74,9 +75,9 @@ main = do
                    else head inputs
        contents <- readFile fName
        case (readGame contents, getDepth flags) of
-        (Nothing, _) -> putStrLn "Invalid game file."
+        --(Nothing, _) -> putStrLn "Invalid game file."
         (game, Nothing) -> putStrLn "Invalid depth flag."
-        (Just game, Just depth) -> dispatch flags game depth
+        (game, Just depth) -> dispatch flags game depth
 
 dispatch :: [Flag] -> Board -> Int -> IO()
 dispatch flags game depth 
