@@ -5,6 +5,8 @@ import System.IO
 import System.Environment
 import Control.Monad
 import System.Console.GetOpt
+import DotsBoxes
+import DotsBoxesSolver
 
 data Flag = Winner | Depth String | MoveFlag String | Verbose | Interactive | Help deriving (Show, Eq)
 
@@ -17,35 +19,31 @@ options = [ Option ['w'] ["winner"]        (NoArg Winner)           "Print the b
           , Option ['h'] ["help"]          (NoArg Help)             "Print usage information and exit."
           ]
 
-executableName = "executableNameGoesHere"
+executableName = "gameplay"
 defaultDepth = 3 --change these for your particular game.
 --delete these four lines after you import your module!
-type Game = Int
-type Move = Int
-readGame = undefined
-makeMove = undefined
 -- to here
 
-moveIO :: [Flag] -> Game -> IO()
+moveIO :: [Flag] -> Board -> IO()
 moveIO flags game = 
   case getMove flags of
     Just movefl -> 
         case makeMove game movefl of
           Just g -> if Verbose `elem` flags 
-                    then putStrLn "Feature not implemented" -- Put your prettyPrint here
-                    else putStrLn "Feature not implemented" -- put your showGame (in the file format) here 
+                    then putStrLn (prettyPrint game) -- Put your prettyPrint here
+                    else putStrLn (showGame game) -- put your showGame (in the file format) here 
           Nothing -> putStrLn "Error: illegal move"
     Nothing -> putStrLn "Error: invalid move format"
 
-showGoodMove :: Bool  -> Int -> Game -> IO ()
+showGoodMove :: Bool  -> Int -> Board -> IO ()
 showGoodMove False depth game = putStrLn "Feature not implemented" -- print the good move for the game
 showGoodMove True depth game = putStrLn "Feature not implemented" -- print both a good move for the game, and who will win.
 
-showBestMove :: Bool  -> Game -> IO ()
-showBestMove False game = putStrLn "Feature not implemented" -- print the best move for the game
-showBestMove True game = putStrLn "Feature not implemented" -- print both the best move for the game, and who will win.
+showBestMove :: Bool  -> Board -> IO ()
+showBestMove False game = putStrLn (showLine (bestMove game)) -- print the best move for the game
+showBestMove True game = putStrLn $ (showLine (bestMove game)) ++ " " ++ (show (whoWillWin game)) -- print both the best move for the game, and who will win.
 
-interactiveIO :: Int -> Game -> IO ()
+interactiveIO :: Int -> Board -> IO ()
 interactiveIO depth game = putStrLn "Feature not implemented" -- entirely optional interactive mode
 
 readMove :: String -> Maybe Move
@@ -77,11 +75,11 @@ main = do
                    else head inputs
        contents <- readFile fName
        case (readGame contents, getDepth flags) of
-        (Nothing, _) -> putStrLn "Invalid game file."
+        --(Nothing, _) -> putStrLn "Invalid game file."
         (game, Nothing) -> putStrLn "Invalid depth flag."
-        (Just game,Just depth) -> dispatch flags game depth
+        (game, Just depth) -> dispatch flags game depth
 
-dispatch :: [Flag] -> Game -> Int -> IO()
+dispatch :: [Flag] -> Board -> Int -> IO()
 dispatch flags game depth 
   | any isMove flags = moveIO flags game
   | Winner `elem` flags = showBestMove (Verbose `elem` flags) game

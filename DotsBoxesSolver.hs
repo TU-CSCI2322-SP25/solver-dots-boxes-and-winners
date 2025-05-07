@@ -1,3 +1,4 @@
+module DotsBoxesSolver where
 import DotsBoxes
 import Data.List(intersect)
 import Data.Maybe
@@ -7,7 +8,6 @@ isTieWith p (Win x) = False
 isTieWith p (Tie xs) = p `elem` xs
 
 whoWillWin :: Board -> Winner
-
 whoWillWin (Board (sizeX, sizeY) gr bx ord)
     |length bx == sizeX * sizeY = fromJust (findWinner (Board (sizeX, sizeY) gr bx ord))
     |otherwise = 
@@ -16,7 +16,6 @@ whoWillWin (Board (sizeX, sizeY) gr bx ord)
         in  if (Win (head ord)) `elem` paths then Win (head ord) else if ties /= [] then head ties else head paths
 
 bestMove :: Board -> Move 
-
 bestMove bd = 
         let options = map (\x -> (x, whoWillWin (fromJust (makeMove (bd) x)))) (legalMoves (bd))
             wonGames = [m| (m,w) <- options, w == Win (head (order bd))]
