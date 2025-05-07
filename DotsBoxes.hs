@@ -1,5 +1,9 @@
 module DotsBoxes where
 import Data.List.Split (splitOn)  
+import Data.Char (isSpace)
+import Data.List (dropWhileEnd)
+
+
 
 
 type Point = (Int, Int)
@@ -66,23 +70,25 @@ showGame (Board sz gr bxs ord) =
 
 readGame :: String -> Board
 readGame input = 
-    let ls = lines input
+    let ls = filter (not . null) (map trim (lines input))  -- Remove empty lines and trim
         [width, height] = map read $ splitOn "," (head ls)
         players = ls !! 1          
-        moves = concatMap parseMove (words (ls !! 2))
-        boxes = parseBoxes (words (ls !! 3))
+        moves = concatMap parseMove (filter (not . null) (words (ls !! 2)))
+        boxes = parseBoxes (filter (not . null) (words (ls !! 3)))
     in Board (width, height) moves boxes (cycle players)
+  where
+    trim = dropWhile isSpace . dropWhileEnd isSpace
 
 parseMove :: String -> [Line]
 parseMove s = 
-    let parts = splitOn "," (filter (/=' ') s)
-        [x,y] = map read (take 2 parts)
-        dir = case last parts of
-                "H" -> Horizontal
-                "h" -> Horizontal
-                "V" -> Vertical
-                "v" -> Vertical
-    in [((x,y), dir)]
+    let clean = filter (not . isSpace) s  -- Remove all whitespace
+        parts = splitOn "," clean
+    in case filter (not . null) parts of  -- Remove empty strings
+        [x,y,"H"] -> [((read x, read y), Horizontal)]
+        [x,y,"h"] -> [((read x, read y), Horizontal)]
+        [x,y,"V"] -> [((read x, read y), Vertical)]
+        [x,y,"v"] -> [((read x, read y), Vertical)]
+        _ -> error $ "Invalid move format: " ++ show s
 
 parseBoxes :: [String] -> [Box]
 parseBoxes [] = []

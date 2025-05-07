@@ -1,5 +1,8 @@
 module Main where
 import Data.Maybe
+
+import Data.List.Split (splitOn)  
+
 import Text.Read
 import System.IO
 import System.Environment
@@ -24,30 +27,51 @@ defaultDepth = 3 --change these for your particular game.
 --delete these four lines after you import your module!
 -- to here
 
-moveIO :: [Flag] -> Board -> IO()
+moveIO :: [Flag] -> Board -> IO ()
 moveIO flags game = 
   case getMove flags of
     Just movefl -> 
         case makeMove game movefl of
           Just g -> if Verbose `elem` flags 
-                    then putStrLn (prettyPrint game) -- Put your prettyPrint here
-                    else putStrLn (showGame game) -- put your showGame (in the file format) here 
+                    then do
+                      putStrLn $ "Move: " ++ showLine movefl
+                      putStrLn $ "Result: " ++ case whoWillWin g of
+                                                Win p -> "Win for " ++ [p]
+                                                Tie ps -> "Tie between " ++ ps
+                      putStrLn (prettyPrint g)
+                    else putStrLn (showGame g)
           Nothing -> putStrLn "Error: illegal move"
     Nothing -> putStrLn "Error: invalid move format"
 
-showGoodMove :: Bool  -> Int -> Board -> IO ()
-showGoodMove False depth game = putStrLn "Feature not implemented" -- print the good move for the game
-showGoodMove True depth game = putStrLn "Feature not implemented" -- print both a good move for the game, and who will win.
-
+showGoodMove :: Bool -> Int -> Board -> IO ()
+showGoodMove False depth game = 
+    let move = bestMove game
+    in putStrLn (showLine move)
+showGoodMove True depth game = 
+    let move = bestMove game
+        result = case makeMove game move of
+                 Just g -> case whoWillWin g of
+                             Win p -> "Win for " ++ [p]
+                             Tie ps -> "Tie between " ++ ps
+                 Nothing -> "Illegal move"
+    in putStrLn $ (showLine move) ++ " (" ++ result ++ ")"
+    
 showBestMove :: Bool  -> Board -> IO ()
-showBestMove False game = putStrLn (showLine (bestMove game)) -- print the best move for the game
-showBestMove True game = putStrLn $ (showLine (bestMove game)) ++ " " ++ (show (whoWillWin game)) -- print both the best move for the game, and who will win.
+showBestMove False game = putStrLn (showLine (bestMove game)) 
+showBestMove True game = putStrLn $ (showLine (bestMove game)) ++ " " ++ (show (whoWillWin game)) 
 
 interactiveIO :: Int -> Board -> IO ()
 interactiveIO depth game = putStrLn "Feature not implemented" -- entirely optional interactive mode
 
 readMove :: String -> Maybe Move
-readMove = undefined -- convert a string into a move
+readMove s = 
+    let parts = splitOn "," s
+    in case parts of
+        [x,y,"H"] -> Just ((read x - 1, read y - 1), Horizontal)
+        [x,y,"h"] -> Just ((read x - 1, read y - 1), Horizontal)
+        [x,y,"V"] -> Just ((read x - 1, read y - 1), Vertical)
+        [x,y,"v"] -> Just ((read x - 1, read y - 1), Vertical)
+        _ -> Nothing
      
 getMove :: [Flag] -> Maybe Move
 getMove [] = Nothing
